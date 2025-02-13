@@ -267,8 +267,9 @@ def build(
     push: bool,
     ignore_missing_submodules: bool,
     pretend: bool,
+    base_dir: Path = None,
 ):
-    base_directory = Path()
+    base_directory = Path() if base_dir is None else base_dir
     docker_images = read_images(base_directory)
     check_submodules(base_directory, ignore_missing_submodules)
     timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
@@ -287,7 +288,11 @@ def build(
 
         # TODO: seriously reconsider this; it feels wrong
         if BASE_DIR_BUILD_OPTION in options:
-            build_dir = Path()
+            if base_dir is not None:
+                build_dir = base_dir
+                full_dockerfile_path = base_dir / full_dockerfile_path
+            else:
+                build_dir = Path()
         else:
             build_dir = full_dockerfile_path.parent
 
